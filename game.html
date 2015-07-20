@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<script src="config.js"></script>
+		<script src="vector.js"></script>
+		<script src="blob.js"></script>
+		<!--link href="http://fonts.googleapis.com/css?family=Roboto+Slab" rel="stylesheet"-->
+		<style>
+			#game {
+				position: relative;
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%,-50%);
+				//border: 2px solid #303030;
+				background-color: #F0F0F0;
+			}
+			#pause-menu {
+				background-color: rgba(150, 0, 0, 0.7);
+				font-size: 5em;
+				font-family: serif;
+				color: white;
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translateX(-50%) translateY(-50%);
+				width: 1000px;
+				height: 500px;
+				vertical-align: center;
+				text-align: center;
+				border-radius: 2px;
+				display: none;
+			}
+
+			#pause-menu p {
+				position: absolute;
+				top: 25%;
+				left: 50%;
+				transform: translateX(-50%);
+			}
+		</style>
+	</head>
+	<body>
+		<canvas id="game" width="1200" height="600"></canvas>
+		<div id="pause-menu">
+			<p>PAUSED</p>
+		</div>
+		<script src="game.js"></script>
+	</body>
+</html>
