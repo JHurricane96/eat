@@ -1,6 +1,10 @@
 var canvas = document.getElementById("game");
 var context = canvas.getContext("2d");
 var pauseMenu = document.getElementById("pause-menu");
+var startMenu = document.getElementById("start-menu");
+var victoryMenu = document.getElementById("victory-menu");
+var lossMenu = document.getElementById("loss-menu");
+var modeButtons = toArray(document.getElementsByClassName("start-menu-choice-btn"));
 var player;
 var enemies = [];
 var score = 0;
@@ -9,6 +13,30 @@ var gameLoop = {};
 var victorious = "undetermined";
 var timeFactorChange = 0;
 var xOffset, yOffset;
+
+function startGame(event) {
+	modeButtons.forEach(function(button) {
+		button.removeEventListener("click", startGame);
+	});
+	startMenu.style.display = "none";
+
+	if (event.target.getAttribute("data-mode") === "normal") {
+		initializeNormal();
+	}
+	else {
+		initializeWithRepulsors();
+	}
+
+	gameLoop.loopFunction = mainLoop;
+	gameLoop.loop = setInterval(gameLoop.loopFunction, 17);
+}
+
+function restartGame(event) {
+	if (event.keyCode === 82) {
+		window.removeEventListener("keydown", restartGame);
+		restart();
+	}
+}
 
 function controlPlayer(event) {
 	var mouseX = event.pageX - canvas.offsetLeft + canvas.width/2;
@@ -55,7 +83,7 @@ function pause(event) {
 	}
 }
 
-function addEvents() {
+function addGameEvents() {
 	canvas.addEventListener("click", controlPlayer);
 	window.addEventListener("keydown", adjustTimeSpeed);
 	window.addEventListener("keydown", pause);
@@ -104,7 +132,7 @@ function initializeWithRepulsors() {
 			);
 		}
 	}
-	addEvents();
+	addGameEvents();
 }
 
 function initializeNormal() {
@@ -121,58 +149,10 @@ function initializeNormal() {
 			enemies[i].position = new Vector((Math.random() * (Screen.width - 2 * enemies[i].size)) + enemies[i].size, (Math.random() * (Screen.height - 2 * enemies[i].size)) + enemies[i].size);
 		}
 	}
-	addEvents();
+	addGameEvents();
 }
 
-function updateNormal() {
-	var toDelete = [];
-	var finalTotalEnemyMass = 0;
-	player.bounceCheck();
-	for (var i = 0; i < enemies.length; ++i) {
-		enemy = enemies[i];
-		enemy.bounceCheck();
-		Blob.eatCheck(player, enemy);
-		if (player.mass <= 0) {
-			victorious = "lost";
-			return;
-		}
-		else if (enemy.mass <= 0 && toDelete.indexOf(i) == -1) {
-			toDelete.push(i);
-			score++;
-		}
-		for (var j = i + 1; j < enemies.length; ++j) {
-			enemyOther = enemies[j];
-			Blob.eatCheck(enemy, enemyOther);
-			if (enemy.mass <= 0 && toDelete.indexOf(i) == -1)
-				toDelete.push(i);
-			else if (enemyOther.mass <= 0 && toDelete.indexOf(j) == -1)
-				toDelete.push(j);
-		}
-		enemy.position.add(Vector.mult(enemy.velocity, timeFactor.factor));
-	}
-	player.position.add(Vector.mult(player.velocity, timeFactor.factor));
-
-	toDelete.sort(function (a, b) {
-		return b - a;
-	});
-	toDelete.forEach(function (index) {
-		enemies.splice(index, 1);
-	});
-
-	enemies.forEach(function (enemy) {
-		finalTotalEnemyMass += enemy.mass;
-	});
-	if (finalTotalEnemyMass < player.mass) {
-		victorious = "won";
-	}
-
-	if (timeFactorChange !== 0) {
-		timeFactor.factor += timeFactorChange;
-		timeFactorChange = 0;
-	}
-}
-
-function updateWithRepulsors() {
+function updateGame() {
 	var toDelete = [];
 	var finalTotalEnemyMass = 0;
 	player.bounceCheck();
@@ -271,64 +251,51 @@ function render() {
 	//document.getElementById('fps').innerHTML = window.mozPaintCount / (Date.now() - starttime) * 1000;
 }
 
-function cleanup() {
+function clearEvents() {
 	canvas.removeEventListener("click", controlPlayer);
 	window.removeEventListener("keydown", adjustTimeSpeed);
 	window.removeEventListener("keydown", pause);
 	clearInterval(gameLoop.loop);
 }
 
-function mainLoopNormal() {
+function checkEndGame() {
 	if (victorious == "lost") {
-		cleanup();
-		var message = document.querySelector("#pause-menu p");
-		message.innerHTML = "YOU LOSE";
-		pauseMenu.style.display = "block";
+		clearEvents();
+		lossMenu.style.display = "block";
+		window.addEventListener("keydown", restartGame);
 	}
 	else if (victorious == "won") {
-		cleanup();
-		var message = document.querySelector("#pause-menu p");
-		message.innerHTML = "YOU WON";
-		pauseMenu.style.display = "block";
+		clearEvents();
+		victoryMenu.style.display = "block";
+		window.addEventListener("keydown", restartGame);
 	}
-	updateNormal();
+}
+
+function mainLoop() {
+	checkEndGame();
+	updateGame();
 	render();
 }
 
-function mainLoopWithRepulsors() {
-	if (victorious == "lost") {
-		cleanup();
-		var message = document.querySelector("#pause-menu p");
-		message.innerHTML = "YOU LOSE";
-		pauseMenu.style.display = "block";
-	}
-	else if (victorious == "won") {
-		cleanup();
-		var message = document.querySelector("#pause-menu p");
-		message.innerHTML = "YOU WON<br>" + score;
-		pauseMenu.style.display = "block";
-	}
-	updateWithRepulsors();
-	render();
-}
-
-function main() {
+function setup() {
 	canvas.width = window.innerWidth;
 	canvas.height = window.innerHeight;
 	Screen.width = window.innerWidth;
 	Screen.height = window.innerHeight;
-	var choice = prompt("With or without?");
-	if (choice == 1) {
-		initializeNormal();
-		gameLoop.loopFunction = mainLoopNormal;
-		gameLoop.loop = setInterval(gameLoop.loopFunction, 17);
-	}
-	else {
-		initializeWithRepulsors();
-		gameLoop.loopFunction = mainLoopWithRepulsors;
-		gameLoop.loop = setInterval(gameLoop.loopFunction, 17);
-	}
-	//starttime = Date.now();
+	modeButtons.forEach(function(button) {
+		button.addEventListener("click", startGame);
+	});
 }
 
-main();
+function restart() {
+	lossMenu.style.display = "none";
+	victoryMenu.style.display = "none";
+	startMenu.style.display = "initial";
+	victorious = "undetermined";
+	timeFactorChange = 0;
+	modeButtons.forEach(function(button) {
+		button.addEventListener("click", startGame);
+	});
+}
+
+setup();

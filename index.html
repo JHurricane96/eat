@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<script src="config.js"></script>
+		<script src="vector.js"></script>
+		<script src="blob.js"></script>
+		<!--link href="http://fonts.googleapis.com/css?family=Roboto+Slab" rel="stylesheet"-->
+		<style>
+			#game {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%,-50%);
+				background-color: #F0F0F0;
+			}
+
+			.menu {
+				background-color: rgba(150, 0, 0, 0.7);
+				font-family: serif;
+				color: white;
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translateX(-50%) translateY(-50%);
+				padding: 10vh;
+				vertical-align: center;
+				text-align: center;
+				border-radius: 2px;
+			}
+
+			button {
+				background-color: rgba(0, 150, 0, 0.7);
+				border: 0;
+				padding: 7px;
+				font-family: serif;
+				color: white;
+				border-radius: 2px;
+				transition: background-color 0.1s;
+			}
+
+			button:hover {
+				background-color: rgba(50, 150, 50, 0.7);
+			}
+
+			#pause-menu, #victory-menu, #loss-menu {
+				font-size: 3em;
+				display: none;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas id="game" width="1200" height="600"></canvas>
+		<div id="start-menu" class="menu">
+			<h2>Instructions:</h2>
+			<p>Click to move</p>
+			<p>Hold left and right arrows to change time</p>
+			<p>Up and down arrows to zoom in and out</p>
+			<p>Esc to pause</p>
+			<p>Avoid large enemies, eat smaller ones</p>
+			<p>Green enemies repel you</p>
+			<p>Win by becoming larger than sum of all enemies</p>
+			<br />
+			<p>Choose your mode:</p>
+			<p><button class="start-menu-choice-btn" data-mode="normal">Normal</button>
+			<button class="start-menu-choice-btn" data-mode="repulsors">Repulsors</button></p>
+		</div>
+		<div id="pause-menu" class="menu">
+			<p>PAUSED</p>
+		</div>
+		<div id="victory-menu" class="menu">
+			<p>YOU WON</p>
+			<p>R TO RESTART</p>
+		</div>
+		<div id="loss-menu" class="menu">
+			<p>YOU LOST</p>
+			<p>R TO RESTART</p>
+		</div>
+		<script src="game.js"></script>
+	</body>
+</html>
