@@ -293,6 +293,7 @@ function restart() {
 	startMenu.style.display = "initial";
 	victorious = "undetermined";
 	timeFactorChange = 0;
+	timeFactor.factor = 1;
 	modeButtons.forEach(function(button) {
 		button.addEventListener("click", startGame);
 	});
